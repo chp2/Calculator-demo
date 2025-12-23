@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EngCalc Pro - Calculation History</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+            extend: {
+                colors: {
+                "primary": "#137fec",
+                "background-light": "#f6f7f8",
+                "background-dark": "#101922",
+                "card-dark": "#1c2936",
+                "border-dark": "#2a3c4d",
+                "text-secondary": "#92adc9",
+                },
+                fontFamily: {
+                "display": ["Space Grotesk", "sans-serif"],
+                "body": ["Noto Sans", "sans-serif"],
+                },
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: "Space Grotesk", "Noto Sans", sans-serif;
+        }
+        /* Custom scrollbar for the history list if needed */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #101922; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #2a3c4d; 
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #137fec; 
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex flex-col overflow-x-hidden text-gray-900 dark:text-white">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 dark:border-border-dark bg-white dark:bg-[#111a22]/90 backdrop-blur-md px-6 py-3 lg:px-10">
+<div class="flex items-center gap-4 text-gray-900 dark:text-white">
+<div class="size-8 text-primary">
+<span class="material-symbols-outlined !text-4xl">calculate</span>
+</div>
+<h2 class="text-xl font-bold leading-tight tracking-[-0.015em]">EngCalc Pro</h2>
+</div>
+<div class="hidden lg:flex flex-1 justify-end gap-8">
+<nav class="flex items-center gap-9">
+<a class="text-gray-500 hover:text-primary dark:text-text-secondary dark:hover:text-white text-sm font-medium leading-normal transition-colors" href="#">Calculator</a>
+<a class="text-gray-500 hover:text-primary dark:text-text-secondary dark:hover:text-white text-sm font-medium leading-normal transition-colors" href="#">Graphing</a>
+<a class="text-gray-500 hover:text-primary dark:text-text-secondary dark:hover:text-white text-sm font-medium leading-normal transition-colors" href="#">Unit Converter</a>
+<a class="text-primary dark:text-white text-sm font-bold leading-normal border-b-2 border-primary pb-0.5" href="#">History</a>
+<a class="text-gray-500 hover:text-primary dark:text-text-secondary dark:hover:text-white text-sm font-medium leading-normal transition-colors" href="#">Settings</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center rounded-lg size-10 hover:bg-gray-100 dark:hover:bg-border-dark text-gray-500 dark:text-white transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10 ring-2 ring-primary/20" data-alt="User profile avatar showing a smiling engineer" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD5m_mv2MfZ_mu1vmbFN9g3eJjIybBkMK3psw7I7OTXU6Fjh9P6V2jDTcDTnKA2m1hGv01Pqg4KlpWifWsunE11YHK1tgXkdLCyaNZfrf_wElC0TS2rtKPW0NVvPr_CAa-abz-HXccSCOs3UWtzeqJIcK40qdVEULxmsBJRT6jCsxCQLNXEVS8zPTM2lckfdmbApFka9eRhDMeU-wtDuq9R6lh-OAxMgTtsBOcM8uCEp09n3DnnJSImvijzmqOO7bJRGAoNUfgWR49I");'></div>
+</div>
+</div>
+<!-- Mobile Menu Icon -->
+<button class="lg:hidden flex items-center justify-center text-gray-500 dark:text-white">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</header>
+<!-- Main Layout -->
+<div class="flex flex-1 max-w-[1600px] w-full mx-auto">
+<!-- Sidebar Filters (Desktop) -->
+<aside class="hidden lg:flex w-72 flex-col border-r border-gray-200 dark:border-border-dark p-6 gap-8 h-[calc(100vh-64px)] sticky top-[64px] overflow-y-auto custom-scrollbar">
+<!-- Quick Actions -->
+<div class="flex flex-col gap-3">
+<button class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-blue-600 text-white font-bold h-12 rounded-lg transition-colors shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-[20px]">add</span>
+<span>New Calculation</span>
+</button>
+<button class="w-full flex items-center justify-center gap-2 bg-gray-100 dark:bg-card-dark hover:bg-gray-200 dark:hover:bg-border-dark text-gray-700 dark:text-white font-medium h-10 rounded-lg transition-colors border border-gray-200 dark:border-border-dark">
+<span class="material-symbols-outlined text-[20px]">upload_file</span>
+<span>Import Data</span>
+</button>
+</div>
+<!-- Date Range Filter -->
+<div class="flex flex-col gap-3">
+<h3 class="text-gray-900 dark:text-white text-sm font-bold uppercase tracking-wider">Date Range</h3>
+<div class="flex flex-col gap-2">
+<label class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-border-dark/50 cursor-pointer group transition-colors">
+<input checked="" class="w-4 h-4 text-primary bg-gray-100 border-gray-300 focus:ring-primary dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" name="date_filter" type="radio"/>
+<span class="text-sm font-medium text-gray-700 dark:text-text-secondary group-hover:text-primary transition-colors">All Time</span>
+</label>
+<label class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-border-dark/50 cursor-pointer group transition-colors">
+<input class="w-4 h-4 text-primary bg-gray-100 border-gray-300 focus:ring-primary dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" name="date_filter" type="radio"/>
+<span class="text-sm font-medium text-gray-700 dark:text-text-secondary group-hover:text-primary transition-colors">Today</span>
+</label>
+<label class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-border-dark/50 cursor-pointer group transition-colors">
+<input class="w-4 h-4 text-primary bg-gray-100 border-gray-300 focus:ring-primary dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" name="date_filter" type="radio"/>
+<span class="text-sm font-medium text-gray-700 dark:text-text-secondary group-hover:text-primary transition-colors">Last 7 Days</span>
+</label>
+<label class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-border-dark/50 cursor-pointer group transition-colors">
+<input class="w-4 h-4 text-primary bg-gray-100 border-gray-300 focus:ring-primary dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" name="date_filter" type="radio"/>
+<span class="text-sm font-medium text-gray-700 dark:text-text-secondary group-hover:text-primary transition-colors">This Month</span>
+</label>
+</div>
+</div>
+<!-- Categories Filter -->
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<h3 class="text-gray-900 dark:text-white text-sm font-bold uppercase tracking-wider">Categories</h3>
+<button class="text-primary text-xs font-bold hover:underline">Edit</button>
+</div>
+<div class="flex flex-col gap-1">
+<button class="flex items-center justify-between p-2 rounded-lg bg-primary/10 text-primary font-medium text-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">functions</span>
+<span>Algebra</span>
+</div>
+<span class="bg-primary text-white text-[10px] px-1.5 py-0.5 rounded-full">12</span>
+</button>
+<button class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-border-dark/50 text-gray-700 dark:text-text-secondary font-medium text-sm transition-colors">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">architecture</span>
+<span>Structural</span>
+</div>
+<span class="bg-gray-200 dark:bg-border-dark text-gray-600 dark:text-gray-400 text-[10px] px-1.5 py-0.5 rounded-full">5</span>
+</button>
+<button class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-border-dark/50 text-gray-700 dark:text-text-secondary font-medium text-sm transition-colors">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">bolt</span>
+<span>Electrical</span>
+</div>
+<span class="bg-gray-200 dark:bg-border-dark text-gray-600 dark:text-gray-400 text-[10px] px-1.5 py-0.5 rounded-full">8</span>
+</button>
+<button class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-border-dark/50 text-gray-700 dark:text-text-secondary font-medium text-sm transition-colors">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">science</span>
+<span>Physics</span>
+</div>
+<span class="bg-gray-200 dark:bg-border-dark text-gray-600 dark:text-gray-400 text-[10px] px-1.5 py-0.5 rounded-full">3</span>
+</button>
+</div>
+</div>
+<!-- Ad Space / Pro Tip -->
+<div class="mt-auto p-4 rounded-xl bg-gradient-to-br from-card-dark to-[#16202a] border border-border-dark relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-white">lightbulb</span>
+</div>
+<h4 class="text-white font-bold text-sm mb-1 relative z-10">Pro Tip</h4>
+<p class="text-text-secondary text-xs leading-relaxed relative z-10">Use <code class="bg-black/30 px-1 py-0.5 rounded text-white">Alt + Enter</code> to quickly restore the last calculation to the editor.</p>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0">
+<!-- Page Header & Breadcrumbs -->
+<div class="px-6 pt-6 pb-2">
+<div class="flex flex-col gap-2 mb-4">
+<nav class="flex items-center text-sm text-text-secondary">
+<a class="hover:text-primary transition-colors" href="#">Home</a>
+<span class="mx-2">/</span>
+<span class="text-white font-medium">History</span>
+</nav>
+<div class="flex flex-wrap items-end justify-between gap-4">
+<div>
+<h1 class="text-white text-3xl font-bold tracking-tight">Calculation History</h1>
+<p class="text-text-secondary mt-1">View, manage, and restore your past engineering calculations.</p>
+</div>
+<div class="flex gap-2">
+<button class="flex items-center gap-2 px-4 py-2 bg-card-dark hover:bg-border-dark border border-border-dark rounded-lg text-sm font-medium text-white transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                                Export CSV
+                            </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-lg text-sm font-medium text-red-400 transition-colors">
+<span class="material-symbols-outlined text-[18px]">delete_sweep</span>
+                                Clear All
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Search & Filters Toolbar -->
+<div class="px-6 py-2 sticky top-[64px] z-30 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-transparent dark:border-border-dark/50">
+<div class="flex flex-col md:flex-row md:items-center gap-4 py-2">
+<!-- Search Bar -->
+<div class="relative flex-1 group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-text-secondary group-focus-within:text-primary transition-colors">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-2.5 border-none rounded-lg leading-5 bg-white dark:bg-card-dark text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-primary sm:text-sm shadow-sm" placeholder="Search formulas, results, or tags (e.g. 'sin', '450 MPa')..." type="text"/>
+<div class="absolute inset-y-0 right-0 pr-2 flex items-center">
+<kbd class="hidden sm:inline-block border border-border-dark rounded px-1.5 text-xs font-medium text-text-secondary">⌘K</kbd>
+</div>
+</div>
+<!-- Sorting & View Options -->
+<div class="flex items-center gap-2 shrink-0 overflow-x-auto pb-2 md:pb-0">
+<select class="form-select block w-full pl-3 pr-10 py-2 text-base border-none focus:outline-none focus:ring-2 focus:ring-primary sm:text-sm rounded-lg bg-white dark:bg-card-dark text-gray-900 dark:text-white shadow-sm cursor-pointer min-w-[140px]">
+<option>Newest First</option>
+<option>Oldest First</option>
+<option>Highest Result</option>
+<option>Lowest Result</option>
+</select>
+<div class="h-8 w-px bg-gray-300 dark:bg-border-dark mx-1"></div>
+<button class="p-2 rounded-lg bg-white dark:bg-card-dark text-primary shadow-sm hover:bg-gray-50 dark:hover:bg-border-dark transition-colors" title="List View">
+<span class="material-symbols-outlined text-[20px]">view_list</span>
+</button>
+<button class="p-2 rounded-lg bg-transparent text-gray-500 dark:text-text-secondary hover:bg-gray-100 dark:hover:bg-border-dark transition-colors" title="Grid View">
+<span class="material-symbols-outlined text-[20px]">grid_view</span>
+</button>
+</div>
+</div>
+<!-- Active Filters Chips -->
+<div class="flex flex-wrap gap-2 mt-2 pb-2">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-primary/20 text-primary border border-primary/20">
+                        Date: Today
+                        <button class="hover:text-white rounded-full"><span class="material-symbols-outlined text-[14px]">close</span></button>
+</span>
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-card-dark text-text-secondary border border-border-dark">
+                        Type: Algebra
+                        <button class="hover:text-white rounded-full"><span class="material-symbols-outlined text-[14px]">close</span></button>
+</span>
+</div>
+</div>
+<!-- Content Scroll Area -->
+<div class="flex-1 p-6 overflow-y-auto custom-scrollbar">
+<!-- Group: Today -->
+<div class="mb-8">
+<div class="flex items-center gap-4 mb-4">
+<h3 class="text-white font-bold text-lg">Today</h3>
+<div class="h-px flex-1 bg-border-dark"></div>
+<span class="text-xs font-medium text-text-secondary uppercase">April 24, 2024</span>
+</div>
+<div class="space-y-3">
+<!-- History Card 1 (Detailed) -->
+<div class="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark hover:border-primary/50 dark:hover:border-primary/50 shadow-sm transition-all duration-200">
+<!-- Left: Content -->
+<div class="flex-1 min-w-0 pr-4 w-full">
+<div class="flex flex-wrap items-center gap-2 mb-2">
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20">Calculus</span>
+<span class="text-xs text-text-secondary">10:42 AM</span>
+</div>
+<div class="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-4 font-display">
+<div class="text-lg text-gray-700 dark:text-gray-300 font-medium font-mono truncate">∫(0 to ∞) e^(-x^2) dx</div>
+<div class="hidden md:block text-gray-500 dark:text-gray-600">=</div>
+<div class="text-2xl font-bold text-primary tracking-tight">0.886227</div> <!-- sqrt(pi)/2 -->
+</div>
+</div>
+<!-- Right: Actions -->
+<div class="flex items-center gap-2 mt-4 sm:mt-0 w-full sm:w-auto justify-end opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+<button class="p-2 rounded-lg text-text-secondary hover:text-white hover:bg-border-dark transition-colors" title="Copy Result">
+<span class="material-symbols-outlined text-[20px]">content_copy</span>
+</button>
+<button class="p-2 rounded-lg text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors" title="Edit Formula">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-2 rounded-lg text-text-secondary hover:text-red-400 hover:bg-red-500/10 transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+<button class="ml-2 flex items-center justify-center gap-1 px-3 py-1.5 bg-primary hover:bg-blue-600 text-white text-xs font-bold rounded-lg shadow-lg shadow-primary/20 transition-all">
+                                    Restore
+                                    <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+<!-- Vertical Stripe for quick visual grouping -->
+<div class="absolute left-0 top-3 bottom-3 w-1 rounded-r bg-purple-500"></div>
+</div>
+<!-- History Card 2 -->
+<div class="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark hover:border-primary/50 dark:hover:border-primary/50 shadow-sm transition-all duration-200">
+<div class="flex-1 min-w-0 pr-4 w-full">
+<div class="flex flex-wrap items-center gap-2 mb-2">
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">Structural</span>
+<span class="text-xs text-text-secondary">09:15 AM</span>
+</div>
+<div class="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-4 font-display">
+<div class="text-lg text-gray-700 dark:text-gray-300 font-medium font-mono truncate">Beam Stress: 45000 / (0.25 * 0.4)</div>
+<div class="hidden md:block text-gray-500 dark:text-gray-600">=</div>
+<div class="text-2xl font-bold text-primary tracking-tight">450,000 <span class="text-sm font-normal text-text-secondary ml-1">Pa</span></div>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-4 sm:mt-0 w-full sm:w-auto justify-end opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+<button class="p-2 rounded-lg text-text-secondary hover:text-white hover:bg-border-dark transition-colors"><span class="material-symbols-outlined text-[20px]">content_copy</span></button>
+<button class="p-2 rounded-lg text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="ml-2 flex items-center justify-center gap-1 px-3 py-1.5 bg-primary hover:bg-blue-600 text-white text-xs font-bold rounded-lg shadow-lg shadow-primary/20 transition-all">Restore <span class="material-symbols-outlined text-[14px]">arrow_forward</span></button>
+</div>
+<div class="absolute left-0 top-3 bottom-3 w-1 rounded-r bg-blue-500"></div>
+</div>
+<!-- History Card 3 -->
+<div class="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark hover:border-primary/50 dark:hover:border-primary/50 shadow-sm transition-all duration-200">
+<div class="flex-1 min-w-0 pr-4 w-full">
+<div class="flex flex-wrap items-center gap-2 mb-2">
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-green-500/10 text-green-400 border border-green-500/20">Finance</span>
+<span class="text-xs text-text-secondary">08:30 AM</span>
+</div>
+<div class="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-4 font-display">
+<div class="text-lg text-gray-700 dark:text-gray-300 font-medium font-mono truncate">PV(0.05, 10, 1000)</div>
+<div class="hidden md:block text-gray-500 dark:text-gray-600">=</div>
+<div class="text-2xl font-bold text-primary tracking-tight">$7,721.73</div>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-4 sm:mt-0 w-full sm:w-auto justify-end opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+<button class="p-2 rounded-lg text-text-secondary hover:text-white hover:bg-border-dark transition-colors"><span class="material-symbols-outlined text-[20px]">content_copy</span></button>
+<button class="p-2 rounded-lg text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="ml-2 flex items-center justify-center gap-1 px-3 py-1.5 bg-primary hover:bg-blue-600 text-white text-xs font-bold rounded-lg shadow-lg shadow-primary/20 transition-all">Restore <span class="material-symbols-outlined text-[14px]">arrow_forward</span></button>
+</div>
+<div class="absolute left-0 top-3 bottom-3 w-1 rounded-r bg-green-500"></div>
+</div>
+</div>
+</div>
+<!-- Group: Yesterday -->
+<div class="mb-8">
+<div class="flex items-center gap-4 mb-4">
+<h3 class="text-white font-bold text-lg">Yesterday</h3>
+<div class="h-px flex-1 bg-border-dark"></div>
+<span class="text-xs font-medium text-text-secondary uppercase">April 23, 2024</span>
+</div>
+<div class="space-y-3">
+<!-- History Card 4 -->
+<div class="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark hover:border-primary/50 dark:hover:border-primary/50 shadow-sm transition-all duration-200 opacity-80 hover:opacity-100">
+<div class="flex-1 min-w-0 pr-4 w-full">
+<div class="flex flex-wrap items-center gap-2 mb-2">
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500/10 text-orange-400 border border-orange-500/20">Trigonometry</span>
+<span class="text-xs text-text-secondary">4:15 PM</span>
+</div>
+<div class="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-4 font-display">
+<div class="text-lg text-gray-700 dark:text-gray-300 font-medium font-mono truncate">sin(30°) + cos(60°)</div>
+<div class="hidden md:block text-gray-500 dark:text-gray-600">=</div>
+<div class="text-2xl font-bold text-primary tracking-tight">1.0</div>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-4 sm:mt-0 w-full sm:w-auto justify-end opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+<button class="p-2 rounded-lg text-text-secondary hover:text-white hover:bg-border-dark transition-colors"><span class="material-symbols-outlined text-[20px]">content_copy</span></button>
+<button class="p-2 rounded-lg text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="ml-2 flex items-center justify-center gap-1 px-3 py-1.5 bg-primary/20 hover:bg-primary text-primary hover:text-white text-xs font-bold rounded-lg border border-primary/20 hover:border-transparent transition-all">Restore <span class="material-symbols-outlined text-[14px]">arrow_forward</span></button>
+</div>
+<div class="absolute left-0 top-3 bottom-3 w-1 rounded-r bg-orange-500"></div>
+</div>
+<!-- History Card 5 -->
+<div class="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-xl bg-white dark:bg-card-dark border border-gray-200 dark:border-border-dark hover:border-primary/50 dark:hover:border-primary/50 shadow-sm transition-all duration-200 opacity-80 hover:opacity-100">
+<div class="flex-1 min-w-0 pr-4 w-full">
+<div class="flex flex-wrap items-center gap-2 mb-2">
+<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-pink-500/10 text-pink-400 border border-pink-500/20">Physics</span>
+<span class="text-xs text-text-secondary">2:00 PM</span>
+</div>
+<div class="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-4 font-display">
+<div class="text-lg text-gray-700 dark:text-gray-300 font-medium font-mono truncate">F = m * a (15kg * 9.8m/s²)</div>
+<div class="hidden md:block text-gray-500 dark:text-gray-600">=</div>
+<div class="text-2xl font-bold text-primary tracking-tight">147 <span class="text-sm font-normal text-text-secondary ml-1">N</span></div>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-4 sm:mt-0 w-full sm:w-auto justify-end opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+<button class="p-2 rounded-lg text-text-secondary hover:text-white hover:bg-border-dark transition-colors"><span class="material-symbols-outlined text-[20px]">content_copy</span></button>
+<button class="p-2 rounded-lg text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="ml-2 flex items-center justify-center gap-1 px-3 py-1.5 bg-primary/20 hover:bg-primary text-primary hover:text-white text-xs font-bold rounded-lg border border-primary/20 hover:border-transparent transition-all">Restore <span class="material-symbols-outlined text-[14px]">arrow_forward</span></button>
+</div>
+<div class="absolute left-0 top-3 bottom-3 w-1 rounded-r bg-pink-500"></div>
+</div>
+</div>
+</div>
+<!-- Load More -->
+<div class="flex justify-center mt-8 pb-10">
+<button class="px-6 py-3 rounded-lg bg-card-dark hover:bg-border-dark border border-border-dark text-text-secondary hover:text-white font-medium text-sm transition-colors flex items-center gap-2">
+                        Load older history
+                        <span class="material-symbols-outlined text-[18px]">history</span>
+</button>
+</div>
+</div>
+</main>
+</div>
+</body></html>
