@@ -1,4 +1,4 @@
-import CalculationEngine from '../services/calculationEngine.js';
+import CalculationEngine from '../../services/calculationEngine.js';
 
 class Calculator {
     constructor() {
