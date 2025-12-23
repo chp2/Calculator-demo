@@ -781,25 +781,35 @@ describe('CalculationEngine', () => {
 });
 ```
 
-### 10.2 E2E 테스트 (Playwright)
-```javascript
-// tests/e2e/calculator.spec.js
-import { test, expect } from '@playwright/test';
+### 10.2 UI 테스트 (수동)
+UI 컴포넌트는 자동화 테스트 대신 **수동 테스트**로 진행합니다.
 
-test('should perform calculation and save to history', async ({ page }) => {
-  await page.goto('/');
-  
-  // 계산 입력
-  await page.fill('[data-testid="calculator-input"]', 'sin(30)');
-  await page.click('[data-testid="calculate-button"]');
-  
-  // 결과 확인
-  await expect(page.locator('[data-testid="result"]')).toContainText('0.5');
-  
-  // 히스토리 확인
-  await page.click('[data-testid="history-tab"]');
-  await expect(page.locator('[data-testid="history-item"]').first()).toContainText('sin(30)');
-});
+#### 테스트 체크리스트
+```markdown
+## Calculator 페이지
+- [ ] 모든 버튼 클릭 동작
+- [ ] 키보드 입력 (숫자, 연산자, Enter, Backspace, Escape)
+- [ ] 계산 결과 정확성
+- [ ] 에러 메시지 표시
+- [ ] 히스토리 자동 저장
+
+## History 페이지
+- [ ] 검색 기능 (디바운싱 확인)
+- [ ] 필터링 (날짜, 카테고리)
+- [ ] 정렬 (최신순, 오래된순, 높은순, 낮은순)
+- [ ] Export CSV 다운로드
+- [ ] Copy, Edit, Delete, Restore 버튼
+
+## 반응형
+- [ ] Mobile (< 768px)
+- [ ] Tablet (768px - 1024px)
+- [ ] Desktop (> 1024px)
+
+## 크로스 브라우저
+- [ ] Chrome
+- [ ] Firefox
+- [ ] Safari
+- [ ] Edge
 ```
 
 ---
@@ -903,7 +913,6 @@ chore: 빌드 설정 등
   "autoprefixer": "^10.4.0",
   "postcss": "^8.4.0",
   "vitest": "^1.0.0",
-  "@playwright/test": "^1.40.0",
   "eslint": "^8.55.0",
   "prettier": "^3.1.0"
 }
